@@ -7,6 +7,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  packages: write
+
 env:
   NODE_VERSION: '18'
   REGISTRY_URL: 'https://registry.npmjs.org'
@@ -90,14 +94,15 @@ jobs:
         
     - name: Crear GitHub Release
       if: steps.check-version.outputs.should-publish == 'true'
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: actions/github-script@v7
       with:
-        tag_name: v${{ steps.check-version.outputs.version }}
-        release_name: Release v${{ steps.check-version.outputs.version }}
-        body: |
-          ## Cambios en esta versión
+        script: |
+          const { data: release } = await github.rest.repos.createRelease({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            tag_name: `v${{ steps.check-version.outputs.version }}`,
+            name: `Release v${{ steps.check-version.outputs.version }}`,
+            body: `## Cambios en esta versión
           
           - Versión ${{ steps.check-version.outputs.version }} publicada automáticamente
           - Tests pasando: ✅
@@ -105,8 +110,10 @@ jobs:
           - Build exitoso: ✅
           
           Para instalar esta versión:
-          ```bash
+          \`\`\`bash
           npm install ${{ steps.check-version.outputs.name }}@${{ steps.check-version.outputs.version }}
-          ```
-        draft: false
-        prerelease: false
+          \`\`\``,
+            draft: false,
+            prerelease: false
+          });
+          console.log(`Release created: ${release.html_url}`);
