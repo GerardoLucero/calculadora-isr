@@ -4,17 +4,18 @@
  */
 
 // Tarifas ISR 2024 - Personas Físicas
+// Fuente: Anexo 8 Resolución Miscelánea Fiscal 2024 (DOF), Tabla Art. 96 LISR mensual
 const TARIFAS_ISR_2024 = [
-  { limite_inferior: 0.01, limite_superior: 746.04, cuota_fija: 0, porcentaje: 1.92 },
-  { limite_inferior: 746.05, limite_superior: 6332.05, cuota_fija: 14.32, porcentaje: 6.40 },
-  { limite_inferior: 6332.06, limite_superior: 11128.01, cuota_fija: 371.83, porcentaje: 10.88 },
-  { limite_inferior: 11128.02, limite_superior: 12935.82, cuota_fija: 893.63, porcentaje: 16.00 },
-  { limite_inferior: 12935.83, limite_superior: 15487.71, cuota_fija: 1182.88, porcentaje: 21.36 },
-  { limite_inferior: 15487.72, limite_superior: 31236.49, cuota_fija: 1727.83, porcentaje: 23.52 },
-  { limite_inferior: 31236.50, limite_superior: 49233.00, cuota_fija: 5429.49, porcentaje: 30.00 },
-  { limite_inferior: 49233.01, limite_superior: 93993.90, cuota_fija: 10828.32, porcentaje: 32.00 },
-  { limite_inferior: 93993.91, limite_superior: 125325.20, cuota_fija: 25123.80, porcentaje: 34.00 },
-  { limite_inferior: 125325.21, limite_superior: Infinity, cuota_fija: 35775.24, porcentaje: 35.00 }
+  { limite_inferior: 0.01,      limite_superior: 746.04,    cuota_fija: 0,        porcentaje: 1.92  },
+  { limite_inferior: 746.05,    limite_superior: 6332.05,   cuota_fija: 14.32,    porcentaje: 6.40  },
+  { limite_inferior: 6332.06,   limite_superior: 11128.01,  cuota_fija: 371.83,   porcentaje: 10.88 },
+  { limite_inferior: 11128.02,  limite_superior: 12935.82,  cuota_fija: 893.63,   porcentaje: 16.00 },
+  { limite_inferior: 12935.83,  limite_superior: 15487.71,  cuota_fija: 1182.88,  porcentaje: 17.92 },
+  { limite_inferior: 15487.72,  limite_superior: 31236.49,  cuota_fija: 1640.18,  porcentaje: 21.36 },
+  { limite_inferior: 31236.50,  limite_superior: 49233.00,  cuota_fija: 5004.12,  porcentaje: 23.52 },
+  { limite_inferior: 49233.01,  limite_superior: 93993.90,  cuota_fija: 9236.90,  porcentaje: 30.00 },
+  { limite_inferior: 93993.91,  limite_superior: 125325.20, cuota_fija: 22665.17, porcentaje: 32.00 },
+  { limite_inferior: 125325.21, limite_superior: Infinity,  cuota_fija: 32691.18, porcentaje: 34.00 }
 ];
 
 // Subsidio para el empleo 2024
@@ -32,11 +33,11 @@ const SUBSIDIO_EMPLEO_2024 = [
   { limite_inferior: 7382.34, limite_superior: Infinity, subsidio: 0 }
 ];
 
-// UMA 2024
+// UMA 2024 (DOF 10-ene-2024)
 const UMA_2024 = {
   diaria: 108.57,
   mensual: 3297.57,
-  anual: 39570.84
+  anual: 39628.05  // 108.57 × 365
 };
 
 /**
@@ -46,26 +47,35 @@ const UMA_2024 = {
  * @returns {Object} Resultado del cálculo
  */
 export function calcularISRMensual(ingresoMensual, opciones = {}) {
-  if (!ingresoMensual || ingresoMensual < 0) {
+  if (typeof ingresoMensual !== 'number' || ingresoMensual < 0) {
     throw new Error('El ingreso mensual debe ser un número positivo');
   }
 
   const { incluirSubsidio = true, deduccionPersonal = 0 } = opciones;
-  
+
   // Calcular ingreso gravable
   const ingresoGravable = Math.max(0, ingresoMensual - deduccionPersonal);
-  
+
+  // Ingreso gravable cero: ISR = 0
+  if (ingresoGravable === 0) {
+    return {
+      ingresoMensual: 0, ingresoGravable: 0, deduccionPersonal: parseFloat(deduccionPersonal.toFixed(2)),
+      isrAntesSubsidio: 0, subsidio: 0, isrFinal: 0, ingresoNeto: parseFloat(ingresoMensual.toFixed(2)),
+      tasaEfectiva: 0, tarifa: null
+    };
+  }
+
   // Encontrar tarifa aplicable
-  const tarifa = TARIFAS_ISR_2024.find(t => 
+  const tarifa = TARIFAS_ISR_2024.find(t =>
     ingresoGravable >= t.limite_inferior && ingresoGravable <= t.limite_superior
   );
-  
+
   if (!tarifa) {
     throw new Error('No se encontró tarifa aplicable');
   }
-  
-  // Calcular ISR
-  const excedente = ingresoGravable - tarifa.limite_inferior + 0.01;
+
+  // Calcular ISR (fórmula SAT: excedente × tasa + cuota_fija)
+  const excedente = ingresoGravable - tarifa.limite_inferior;
   const impuestoMarginal = excedente * (tarifa.porcentaje / 100);
   const isrAntesSubsidio = tarifa.cuota_fija + impuestoMarginal;
   
@@ -106,14 +116,14 @@ export function calcularISRMensual(ingresoMensual, opciones = {}) {
  * @returns {Object} Resultado del cálculo
  */
 export function calcularISRAnual(ingresoAnual, opciones = {}) {
-  if (!ingresoAnual || ingresoAnual < 0) {
+  if (typeof ingresoAnual !== 'number' || ingresoAnual < 0) {
     throw new Error('El ingreso anual debe ser un número positivo');
   }
 
   const { deducciones = 0, exentoAguinaldo = 0 } = opciones;
-  
-  // Límite de exención de aguinaldo (30 UMAs)
-  const limiteExencionAguinaldo = UMA_2024.anual * 30 / 365 * 30;
+
+  // Límite de exención de aguinaldo: 30 UMAs diarias (Art. 93 LISR)
+  const limiteExencionAguinaldo = UMA_2024.diaria * 30;
   const aguinaldoExento = Math.min(exentoAguinaldo, limiteExencionAguinaldo);
   
   const ingresoGravable = Math.max(0, ingresoAnual - deducciones - aguinaldoExento);
@@ -142,7 +152,7 @@ export function calcularISRAnual(ingresoAnual, opciones = {}) {
  * @returns {Object} Resultado del cálculo
  */
 export function calcularISRHonorarios(ingresosMensuales, deduccionesMensuales = 0) {
-  if (!ingresosMensuales || ingresosMensuales < 0) {
+  if (typeof ingresosMensuales !== 'number' || ingresosMensuales < 0) {
     throw new Error('Los ingresos deben ser un número positivo');
   }
 
@@ -179,8 +189,8 @@ export function obtenerTarifasISR() {
     subsidioEmpleo: SUBSIDIO_EMPLEO_2024,
     uma: UMA_2024,
     limitesExencion: {
-      aguinaldo: UMA_2024.anual * 30 / 365 * 30,
-      primaVacacional: UMA_2024.anual * 15 / 365 * 15,
+      aguinaldo: UMA_2024.diaria * 30,          // 30 UMAs diarias (Art. 93 LISR)
+      primaVacacional: UMA_2024.diaria * 15,  // 15 UMAs diarias
       indemnizacion: UMA_2024.anual * 90
     }
   };
