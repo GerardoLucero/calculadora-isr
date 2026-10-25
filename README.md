@@ -2,11 +2,9 @@
 
 Cálculo de ISR (Impuesto Sobre la Renta) para personas físicas según las tablas oficiales del SAT. Soporta pagos provisionales, retenciones y declaración anual.
 
-[![Ko-fi](https://img.shields.io/badge/Ko--fi-FF5E5B?style=flat&logo=ko-fi&logoColor=white)](https://ko-fi.com/gerardolucero)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/lucerorios0)
-[![GitHub Stars](https://img.shields.io/github/stars/GerardoLucero/calculadora-isr?style=social)](https://github.com/GerardoLucero/calculadora-isr)
 [![npm version](https://badge.fury.io/js/calculadora-isr.svg)](https://www.npmjs.com/package/calculadora-isr)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/GerardoLucero/calculadora-isr/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/GerardoLucero/calculadora-isr/actions/workflows/ci-cd.yml)
 
 ## Features
 
@@ -125,9 +123,16 @@ npm test
 npm run test:coverage
 ```
 
+## Apoyo
+
+Proyecto de código abierto mantenido en mi tiempo libre. Si te fue útil y quieres agradecerlo:
+
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-FF5E5B?style=flat&logo=ko-fi&logoColor=white)](https://ko-fi.com/gerardolucero)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/lucerorios0)
+
 ## Licencia
 
-MIT © [Gerardo Lucero](https://github.com/GerardoLucero)
+MIT © [Gerardo Lucero](https://github.com/GerardoLucero), ver [LICENSE](LICENSE).
 
 ---
 
