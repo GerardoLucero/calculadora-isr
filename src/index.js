@@ -1,49 +1,74 @@
 /**
- * Calculadora de ISR (Impuesto Sobre la Renta) México 2024
- * Basada en las tarifas oficiales del SAT
+ * Calculadora de ISR (Impuesto Sobre la Renta) México 2026
+ * Basada en las tarifas oficiales del SAT (Anexo 8 de la RMF 2026, DOF 28-12-2025)
  */
 
-// Tarifas ISR 2024 - Personas Físicas
-// Fuente: Anexo 8 Resolución Miscelánea Fiscal 2024 (DOF), Tabla Art. 96 LISR mensual
-const TARIFAS_ISR_2024 = [
-  { limite_inferior: 0.01,      limite_superior: 746.04,    cuota_fija: 0,        porcentaje: 1.92  },
-  { limite_inferior: 746.05,    limite_superior: 6332.05,   cuota_fija: 14.32,    porcentaje: 6.40  },
-  { limite_inferior: 6332.06,   limite_superior: 11128.01,  cuota_fija: 371.83,   porcentaje: 10.88 },
-  { limite_inferior: 11128.02,  limite_superior: 12935.82,  cuota_fija: 893.63,   porcentaje: 16.00 },
-  { limite_inferior: 12935.83,  limite_superior: 15487.71,  cuota_fija: 1182.88,  porcentaje: 17.92 },
-  { limite_inferior: 15487.72,  limite_superior: 31236.49,  cuota_fija: 1640.18,  porcentaje: 21.36 },
-  { limite_inferior: 31236.50,  limite_superior: 49233.00,  cuota_fija: 5004.12,  porcentaje: 23.52 },
-  { limite_inferior: 49233.01,  limite_superior: 93993.90,  cuota_fija: 9236.90,  porcentaje: 30.00 },
-  { limite_inferior: 93993.91,  limite_superior: 125325.20, cuota_fija: 22665.17, porcentaje: 32.00 },
-  { limite_inferior: 125325.21, limite_superior: Infinity,  cuota_fija: 32691.18, porcentaje: 34.00 }
+// Tarifa mensual 2026 - Personas físicas (pagos provisionales y retenciones)
+// Fuente: Anexo 8 RMF 2026, apartado B, fracción V (DOF 28-dic-2025), art. 96 LISR
+const TARIFAS_ISR_2026 = [
+  { limite_inferior: 0.01,      limite_superior: 844.59,    cuota_fija: 0,         porcentaje: 1.92  },
+  { limite_inferior: 844.60,    limite_superior: 7168.51,   cuota_fija: 16.22,     porcentaje: 6.40  },
+  { limite_inferior: 7168.52,   limite_superior: 12598.02,  cuota_fija: 420.95,    porcentaje: 10.88 },
+  { limite_inferior: 12598.03,  limite_superior: 14644.64,  cuota_fija: 1011.68,   porcentaje: 16.00 },
+  { limite_inferior: 14644.65,  limite_superior: 17533.64,  cuota_fija: 1339.14,   porcentaje: 17.92 },
+  { limite_inferior: 17533.65,  limite_superior: 35362.83,  cuota_fija: 1856.84,   porcentaje: 21.36 },
+  { limite_inferior: 35362.84,  limite_superior: 55736.68,  cuota_fija: 5665.16,   porcentaje: 23.52 },
+  { limite_inferior: 55736.69,  limite_superior: 106410.50, cuota_fija: 10457.09,  porcentaje: 30.00 },
+  { limite_inferior: 106410.51, limite_superior: 141880.66, cuota_fija: 25659.23,  porcentaje: 32.00 },
+  { limite_inferior: 141880.67, limite_superior: 425641.99, cuota_fija: 37009.69,  porcentaje: 34.00 },
+  { limite_inferior: 425642.00, limite_superior: Infinity,  cuota_fija: 133488.54, porcentaje: 35.00 }
 ];
 
-// Subsidio para el empleo 2024
-const SUBSIDIO_EMPLEO_2024 = [
-  { limite_inferior: 0.01, limite_superior: 1768.96, subsidio: 407.02 },
-  { limite_inferior: 1768.97, limite_superior: 2653.38, subsidio: 406.83 },
-  { limite_inferior: 2653.39, limite_superior: 3472.84, subsidio: 406.62 },
-  { limite_inferior: 3472.85, limite_superior: 3537.87, subsidio: 392.77 },
-  { limite_inferior: 3537.88, limite_superior: 4446.15, subsidio: 382.46 },
-  { limite_inferior: 4446.16, limite_superior: 4717.18, subsidio: 354.23 },
-  { limite_inferior: 4717.19, limite_superior: 5335.42, subsidio: 324.87 },
-  { limite_inferior: 5335.43, limite_superior: 6224.67, subsidio: 294.63 },
-  { limite_inferior: 6224.68, limite_superior: 7113.90, subsidio: 253.54 },
-  { limite_inferior: 7113.91, limite_superior: 7382.33, subsidio: 217.61 },
-  { limite_inferior: 7382.34, limite_superior: Infinity, subsidio: 0 }
+// Tarifa anual 2026 (ejercicio 2026, arts. 97 y 152 LISR)
+// Fuente: Anexo 8 RMF 2026, apartado C, fracción II (DOF 28-dic-2025)
+const TARIFAS_ISR_ANUAL_2026 = [
+  { limite_inferior: 0.01,        limite_superior: 10135.11,     cuota_fija: 0,          porcentaje: 1.92  },
+  { limite_inferior: 10135.12,    limite_superior: 86022.11,     cuota_fija: 194.59,     porcentaje: 6.40  },
+  { limite_inferior: 86022.12,    limite_superior: 151176.19,    cuota_fija: 5051.37,    porcentaje: 10.88 },
+  { limite_inferior: 151176.20,   limite_superior: 175735.66,    cuota_fija: 12140.13,   porcentaje: 16.00 },
+  { limite_inferior: 175735.67,   limite_superior: 210403.69,    cuota_fija: 16069.64,   porcentaje: 17.92 },
+  { limite_inferior: 210403.70,   limite_superior: 424353.97,    cuota_fija: 22282.14,   porcentaje: 21.36 },
+  { limite_inferior: 424353.98,   limite_superior: 668840.14,    cuota_fija: 67981.92,   porcentaje: 23.52 },
+  { limite_inferior: 668840.15,   limite_superior: 1276925.98,   cuota_fija: 125485.07,  porcentaje: 30.00 },
+  { limite_inferior: 1276925.99,  limite_superior: 1702567.97,   cuota_fija: 307910.81,  porcentaje: 32.00 },
+  { limite_inferior: 1702567.98,  limite_superior: 5107703.92,   cuota_fija: 444116.23,  porcentaje: 34.00 },
+  { limite_inferior: 5107703.93,  limite_superior: Infinity,     cuota_fija: 1601862.46, porcentaje: 35.00 }
 ];
 
-// UMA 2024 (DOF 10-ene-2024)
-const UMA_2024 = {
-  diaria: 108.57,
-  mensual: 3297.57,
-  anual: 39628.05  // 108.57 × 365
+// UMA 2026 (INEGI, DOF 09-ene-2026; vigente del 1 de febrero de 2026 al 31 de enero de 2027)
+// Enero de 2026 todavia se rige por la UMA 2025 (diaria 113.14).
+const UMA_2026 = {
+  diaria: 117.31,
+  mensual: 3566.22,
+  anual: 42794.64
 };
+
+// Subsidio para el empleo 2026
+// Fuente: Decreto por el que se modifica el diverso que otorga el subsidio para el empleo (DOF 31-dic-2025).
+// Se otorga a quien tenga ingresos mensuales de hasta 11,492.66; febrero a diciembre equivale a 15.02% de la
+// UMA mensual (535.65) y enero de 2026 tiene un monto transitorio de 536.21 (15.59% de la UMA 2025).
+const SUBSIDIO_EMPLEO_2026 = {
+  limiteIngresoMensual: 11492.66,
+  mensual: 535.65,
+  enero: 536.21
+};
+
+/**
+ * Busca el renglon de una tarifa: el ultimo cuyo limite inferior no excede el ingreso.
+ * (Evita los huecos de centavos entre renglones.)
+ */
+function buscarTarifa(tarifas, ingreso) {
+  let encontrada = null;
+  for (const t of tarifas) {
+    if (ingreso >= t.limite_inferior) encontrada = t;
+  }
+  return encontrada;
+}
 
 /**
  * Calcula el ISR mensual para personas físicas
  * @param {number} ingresoMensual - Ingreso mensual bruto
- * @param {Object} opciones - Opciones de cálculo
+ * @param {Object} opciones - { incluirSubsidio = true, deduccionPersonal = 0, mes } (mes 1 usa el subsidio transitorio de enero)
  * @returns {Object} Resultado del cálculo
  */
 export function calcularISRMensual(ingresoMensual, opciones = {}) {
@@ -51,7 +76,7 @@ export function calcularISRMensual(ingresoMensual, opciones = {}) {
     throw new Error('El ingreso mensual debe ser un número positivo');
   }
 
-  const { incluirSubsidio = true, deduccionPersonal = 0 } = opciones;
+  const { incluirSubsidio = true, deduccionPersonal = 0, mes = null } = opciones;
 
   // Calcular ingreso gravable
   const ingresoGravable = Math.max(0, ingresoMensual - deduccionPersonal);
@@ -66,9 +91,7 @@ export function calcularISRMensual(ingresoMensual, opciones = {}) {
   }
 
   // Encontrar tarifa aplicable
-  const tarifa = TARIFAS_ISR_2024.find(t =>
-    ingresoGravable >= t.limite_inferior && ingresoGravable <= t.limite_superior
-  );
+  const tarifa = buscarTarifa(TARIFAS_ISR_2026, ingresoGravable);
 
   if (!tarifa) {
     throw new Error('No se encontró tarifa aplicable');
@@ -81,11 +104,8 @@ export function calcularISRMensual(ingresoMensual, opciones = {}) {
   
   // Calcular subsidio
   let subsidio = 0;
-  if (incluirSubsidio) {
-    const tarifaSubsidio = SUBSIDIO_EMPLEO_2024.find(s => 
-      ingresoGravable >= s.limite_inferior && ingresoGravable <= s.limite_superior
-    );
-    subsidio = tarifaSubsidio ? tarifaSubsidio.subsidio : 0;
+  if (incluirSubsidio && ingresoGravable <= SUBSIDIO_EMPLEO_2026.limiteIngresoMensual) {
+    subsidio = mes === 1 ? SUBSIDIO_EMPLEO_2026.enero : SUBSIDIO_EMPLEO_2026.mensual;
   }
   
   const isrFinal = Math.max(0, isrAntesSubsidio - subsidio);
@@ -123,15 +143,15 @@ export function calcularISRAnual(ingresoAnual, opciones = {}) {
   const { deducciones = 0, exentoAguinaldo = 0 } = opciones;
 
   // Límite de exención de aguinaldo: 30 UMAs diarias (Art. 93 LISR)
-  const limiteExencionAguinaldo = UMA_2024.diaria * 30;
+  const limiteExencionAguinaldo = UMA_2026.diaria * 30;
   const aguinaldoExento = Math.min(exentoAguinaldo, limiteExencionAguinaldo);
   
   const ingresoGravable = Math.max(0, ingresoAnual - deducciones - aguinaldoExento);
-  const ingresoMensualPromedio = ingresoGravable / 12;
-  
-  // Calcular ISR mensual y multiplicar por 12
-  const calculoMensual = calcularISRMensual(ingresoMensualPromedio, { incluirSubsidio: false });
-  const isrAnual = calculoMensual.isrAntesSubsidio * 12;
+  // Tarifa anual del ejercicio (arts. 97 y 152 LISR), no la mensual por 12
+  const tarifaAnual = buscarTarifa(TARIFAS_ISR_ANUAL_2026, ingresoGravable);
+  const isrAnual = tarifaAnual
+    ? tarifaAnual.cuota_fija + (ingresoGravable - tarifaAnual.limite_inferior) * (tarifaAnual.porcentaje / 100)
+    : 0;
   
   return {
     ingresoAnual: parseFloat(ingresoAnual.toFixed(2)),
@@ -140,7 +160,7 @@ export function calcularISRAnual(ingresoAnual, opciones = {}) {
     ingresoGravable: parseFloat(ingresoGravable.toFixed(2)),
     isrAnual: parseFloat(isrAnual.toFixed(2)),
     ingresoNetoAnual: parseFloat((ingresoAnual - isrAnual).toFixed(2)),
-    tasaEfectiva: parseFloat(((isrAnual / ingresoAnual) * 100).toFixed(2)),
+    tasaEfectiva: ingresoAnual > 0 ? parseFloat(((isrAnual / ingresoAnual) * 100).toFixed(2)) : 0,
     isrMensualPromedio: parseFloat((isrAnual / 12).toFixed(2))
   };
 }
@@ -184,14 +204,15 @@ export function calcularISRHonorarios(ingresosMensuales, deduccionesMensuales = 
  */
 export function obtenerTarifasISR() {
   return {
-    año: 2024,
-    tarifas: TARIFAS_ISR_2024,
-    subsidioEmpleo: SUBSIDIO_EMPLEO_2024,
-    uma: UMA_2024,
+    año: 2026,
+    tarifas: TARIFAS_ISR_2026,
+    tarifasAnuales: TARIFAS_ISR_ANUAL_2026,
+    subsidioEmpleo: SUBSIDIO_EMPLEO_2026,
+    uma: UMA_2026,
     limitesExencion: {
-      aguinaldo: UMA_2024.diaria * 30,          // 30 UMAs diarias (Art. 93 LISR)
-      primaVacacional: UMA_2024.diaria * 15,  // 15 UMAs diarias
-      indemnizacion: UMA_2024.anual * 90
+      aguinaldo: UMA_2026.diaria * 30,          // 30 UMAs diarias (Art. 93 LISR)
+      primaVacacional: UMA_2026.diaria * 15,    // 15 UMAs diarias
+      indemnizacionPorAnioServicio: UMA_2026.diaria * 90 // 90 UMAs diarias por cada año de servicio
     }
   };
 }
