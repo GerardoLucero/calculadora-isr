@@ -1,6 +1,6 @@
 {
   "name": "calculadora-isr",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "Calculadora completa de ISR (Impuesto Sobre la Renta) mexicano con tarifas actualizadas",
   "main": "dist/index.js",
@@ -30,7 +30,7 @@
   ],
   "author": {
     "name": "Gerardo Lucero",
-    "email": "tu-email@ejemplo.com"
+    "email": "luceroriosg@gmail.com"
   },
   "license": "MIT",
   "repository": {
